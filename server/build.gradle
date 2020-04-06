@@ -1,0 +1,21 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+mainClassName = 'com.mykhaliev.metrics.server.ServerApplication'
+group 'com.mykhaliev'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile project(':metrics-library')
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '2.2.6.RELEASE'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-jdbc', version: '2.2.6.RELEASE'
+    compile group: 'org.postgresql', name: 'postgresql', version: '42.2.11'
+    compile group: 'org.liquibase', name: 'liquibase-core', version: '3.8.8'
+}

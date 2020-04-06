@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet id="create_change_set" author="mykhaliev">
+
+        <createTable tableName="metrics">
+            <column name="id" type="bigserial" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="name" type="varchar">
+                <constraints nullable="false"/>
+            </column>
+            <column name="dimensions" type="jsonb">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="values">
+            <column name="timestamp" type="timestamptz">
+                <constraints nullable="false"/>
+            </column>
+            <column name="value" type="float8">
+                <constraints nullable="false"/>
+            </column>
+            <column name="metric_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="metadata" type="json">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+
+
+        <createView viewName="metrics_view" replaceIfExists="true">
+            SELECT timestamp, value, name, dimensions, metadata
+            FROM values INNER JOIN metrics ON values.metric_id = metrics.id
+        </createView>
+
+        <createProcedure dbms="postgresql">
+            CREATE FUNCTION create_metric (
+            in_name VARCHAR,
+            in_dims JSONB) RETURNS INT LANGUAGE plpgsql AS $_$
+            DECLARE
+            out_id INT;
+            BEGIN
+            SELECT id INTO out_id
+            FROM metrics AS m
+            WHERE m.name= in_name AND
+            m.dimensions = in_dims;
+            IF NOT FOUND THEN
+            INSERT INTO METRICS
+            ("name", "dimensions")
+            VALUES
+            (in_name, in_dims)
+            RETURNING id into out_id;
+            END IF;
+            RETURN out_id;
+            END; $_$
+        </createProcedure>
+        <sql dbms="postgresql">
+            CREATE RULE metrics_view_insert
+            AS ON INSERT TO metrics_view
+            DO INSTEAD
+            INSERT INTO VALUES (
+            timestamp, value, metric_id, metadata)
+            VALUES (
+            NEW.TIMESTAMP,
+            NEW.value,
+            create_metric(
+            NEW.name,
+            NEW.dimensions),
+            NEW.metadata
+            );
+        </sql>
+
+        <addForeignKeyConstraint baseTableName="values"
+                                 baseColumnNames="metric_id"
+                                 constraintName="fk_values_metric_id"
+                                 referencedTableName="metrics"
+                                 referencedColumnNames="id"/>
+
+        <addUniqueConstraint
+                columnNames="name, dimensions"
+                constraintName="metrics_name_dimensions_uq"
+                tableName="metrics"
+        />
+
+        <sql dbms="postgresql">
+            CREATE INDEX metrics_dimensions_index ON metrics USING gin (dimensions)
+        </sql>
+
+        <!--btree by default-->
+        <createIndex tableName="values"
+                     indexName="values_metric_id_timestamp_index">
+            <column name="metric_id"/>
+            <column name="timestamp"/>
+        </createIndex>
+
+
+    </changeSet>
+
+</databaseChangeLog>

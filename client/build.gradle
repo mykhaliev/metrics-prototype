@@ -1,0 +1,12 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+mainClassName = 'com.mykhaliev.metrics.server.ClientApplication'
+group 'com.mykhaliev'
+version '1.0-SNAPSHOT'
+
+dependencies{
+    compile project(':metrics-library')
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator', version: '2.2.6.RELEASE'
+}

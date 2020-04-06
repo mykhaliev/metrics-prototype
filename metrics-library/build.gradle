@@ -1,0 +1,22 @@
+plugins {
+    id 'java'
+}
+
+group 'com.mykhaliev'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile group: 'io.micrometer', name: 'micrometer-core', version: '1.4.1'
+
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.10.3'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.10.3'
+
+    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
+
+}

@@ -1,0 +1,5 @@
+rootProject.name = 'metrics'
+include 'server'
+include 'client'
+include 'metrics-library'
+

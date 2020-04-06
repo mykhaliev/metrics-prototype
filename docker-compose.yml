@@ -1,0 +1,15 @@
+version: '2.1'
+
+services:
+  postgres:
+    container_name: metrics-postgres
+    image: postgres:11.2
+    volumes:
+      - ./databases/postgres/data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_USER=root
+      - POSTGRES_DB=metrics
+      - PGDATA=/postgres/data/pgdata
+    ports:
+      - 5432:5432
