@@ -41,12 +41,12 @@ public class MetricApiController {
     @PostMapping
     public ResponseEntity createMetrics(@RequestBody MetricSerie body) {
         if (body != null && body.getMetrics() != null) {
-            batchUpdateUsingJDBCTemplate(body.getMetrics());
+            batchInsertMetric(body.getMetrics());
         }
         return ResponseEntity.ok("Metric was created");
     }
 
-    public void batchUpdateUsingJDBCTemplate(final List<Metric> metrics) {
+    public void batchInsertMetric(final List<Metric> metrics) {
         jdbcTemplate.batchUpdate("INSERT INTO METRICS_VIEW (TIMESTAMP, VALUE, NAME, DIMENSIONS, METADATA)" +
                 " VALUES (?, ?, ?, ?, ?)", new BatchPreparedStatementSetter() {
 

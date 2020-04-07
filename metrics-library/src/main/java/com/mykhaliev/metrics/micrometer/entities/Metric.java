@@ -1,6 +1,5 @@
 package com.mykhaliev.metrics.micrometer.entities;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.mykhaliev.metrics.micrometer.entities.json.OffsetDateTimeMillisDeserializer;
